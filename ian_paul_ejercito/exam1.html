@@ -1,0 +1,249 @@
+<html>
+<head>
+    <title>Betica Shop</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Ian Paul Ejercito">
+    <link rel="stylesheet" href="assets/style/style.css">
+</head>
+<body>
+    <section id="hero">
+        <div class="container">
+            <nav class="navbar">
+                <a class="burger_nav" href="#"></a>   
+                <img src="assets/images/betica_logo.png" alt="">
+                <ul class="nav_ul">
+                    <li><a href="" class="display_all">All items</a></li>
+                </ul>
+                <div class="clear"></div>                        
+            </nav>
+        </div>
+    </section>
+    <section id="contents">
+        <div class="container">
+        </div>
+    </section>
+    <script type="text/javascript">
+    "use strict";
+    var info = {
+        "items": {
+            "c001": {
+                "parent": "c000",
+                "title": "Phones"
+            },
+            "c002": {
+                "parent": "c000",
+                "title": "Laptops"
+            },
+            "c003": {
+                "parent": "c000",
+                "title": "Accessories"
+            },
+            "c004": {
+                "parent": "c100",
+                "title": "Cameras"
+            },
+            "p001": {
+                "parent": "c001",
+                "manufacturer": "Apple",
+                "title": "iPhone 10",
+                "price": 499,
+                "releaseDate": "2018-04-23T18:25:43.511Z"
+            },
+            "p002": {
+                "parent": "c002",
+                "manufacturer": "Apple",
+                "title": "Macbook Pro 2017",
+                "price": 1999,
+                "releaseDate": "2017-04-23T18:25:43.511Z"
+            },
+            "p003": {
+                "parent": "c002",
+                "manufacturer": "Dell",
+                "title": "XPS 13",
+                "price": 1399,
+                "releaseDate": "2017-04-23T18:25:43.511Z"
+            },
+            "p004": {
+                "parent": "c001",
+                "manufacturer": "Samsung",
+                "title": "Samsung Galaxy S10",
+                "price": 399,
+                "releaseDate": "2017-04-23T18:25:43.511Z"
+            },
+            "p005": {
+                "parent": "c003",
+                "manufacturer": "Apple",
+                "title": "Apple Charger 12W",
+                "price": 99,
+                "releaseDate": "2016-12-23T18:25:43.511Z"
+            },
+            "p006": {
+                "parent": "c003",
+                "manufacturer": "Samsung",
+                "title": "Samsung Charger 12W",
+                "price": 89,
+                "releaseDate": "2017-04-23T18:25:43.511Z"  
+            },
+            "p007": {
+                "parent": "c005",
+                "manufacturer": "Samsung",
+                "title": "Samsung VR Headset",
+                "price": 699,
+                "releaseDate": "2018-04-23T18:25:43.511Z"
+            }
+        }
+    };
+        
+    // enter your code here
+    // render the items in the info using native Javascript or jQuery
+        
+    var ui_controller = (function(){
+         
+         var dom_strings = {
+             nav_ul: ".nav_ul",
+             nav_ul_li_a: ".nav_ul li a",
+             contents: "#contents",
+             contents_container: "#contents .container",
+             category_items: ".category_items",
+             display_all: ".display_all",
+             burger_nav: ".burger_nav"
+         }
+         
+        var htm_nav = "<li><a class='%class_name%' href=''>%title%</a></li>";
+        
+        var htm_items = "<div class='category_items'>" +
+                            "<div class='item_header'><h3><strong>%title%</strong></h3></div>" +
+                            "<p>₱%price%</p>"+
+                            "<p>Released Date: %release_date%</p>" +
+                            "<p>Manufactured by: <strong>%manufacturer%</strong></p>" +
+                            "<div class='buy_now'><p><strong>ADD TO CART</strong></p></div>" +
+                        "</div>";
+        
+        var remove_elements = function(elements){
+            var elements = document.querySelectorAll(elements), fields_array;
+            fields_array = Array.prototype.slice.call(elements);
+            if(fields_array.length > 0){
+                fields_array.forEach(function(current, index, array) {
+                    array[index].remove();
+                }); 
+            }
+        }
+         
+        return {
+            dom_strings: dom_strings,
+            htm_nav: htm_nav,
+            htm_items: htm_items,
+            remove_elements: remove_elements
+        }
+    })();   
+        
+    var data_controller = (function(info, ui){
+        var dom = ui.dom_strings, htm_nav = ui.htm_nav, htm_items = ui.htm_items;
+        var item_keys = Object.keys(info.items);
+        
+        var is_valid_items = function(id){
+            return (item_keys.indexOf(id) != -1) ? true : false;
+        }
+        
+        var format_date = function(date){
+            var new_date = new Date(date), month, day, year;
+            var months = ["January", "February", "March", "April", "May", "June", "July", "August", 
+                "September", "October", "November", "December"];
+            month = months[new_date.getMonth()];
+            day = new_date.getDate();
+            year = new_date.getFullYear();
+            return month + " "+ day +" "+ year; 
+        }
+        
+        var get_categories = function(){
+            var new_template;
+            for(var i = 0; i < item_keys.length; i++){
+                if(item_keys[i].substr(0,3) === "c00"){
+                    new_template = htm_nav.replace("%class_name%", item_keys[i]);
+                    new_template = new_template.replace("%title%", info.items[item_keys[i]].title);
+                    document.querySelector(dom.nav_ul).insertAdjacentHTML("beforeend", new_template);
+                }
+            }
+        }
+        
+        var in_category_items = function(id){
+            var in_category = [];
+            for(var i = 0; i < item_keys.length; i++){
+                if(item_keys[i].substr(0,3) === "p00"){
+                    in_category.push(info.items[item_keys[i]].parent);
+                }
+            }
+            if(in_category.indexOf(id) < 0)
+                alert("No item in this category");
+        }
+        
+        var get_category_items = function(id){
+            var new_template, new_date;
+            ui.remove_elements(dom.category_items);
+
+            if(is_valid_items(id)){
+                
+                in_category_items(id);
+                
+                for(var i = 0; i < item_keys.length; i++){
+                    if(item_keys[i].substr(0,3) === "p00" && info.items[item_keys[i]].parent === id){
+                        new_template = htm_items.replace("%manufacturer%", info.items[item_keys[i]].manufacturer);
+                        new_template = new_template.replace("%title%", info.items[item_keys[i]].title);
+                        new_template = new_template.replace("%price%", info.items[item_keys[i]].price.toLocaleString());
+                        new_template = new_template.replace("%release_date%", format_date(info.items[item_keys[i]].releaseDate));
+                        document.querySelector(dom.contents_container).insertAdjacentHTML("beforeend", new_template);
+                    }
+                }
+            }else if(id == "display_all"){
+                for(var i = 0; i < item_keys.length; i++){
+                    if(item_keys[i].substr(0,3) === "p00"){
+                        new_template = htm_items.replace("%manufacturer%", info.items[item_keys[i]].manufacturer);
+                        new_template = new_template.replace("%title%", info.items[item_keys[i]].title);
+                        new_template = new_template.replace("%price%", info.items[item_keys[i]].price.toLocaleString());
+                        new_template = new_template.replace("%release_date%", format_date(info.items[item_keys[i]].releaseDate));
+                        document.querySelector(dom.contents_container).insertAdjacentHTML("beforeend", new_template);
+                    }
+                }      
+            }else
+                console.log("not a category item");
+        }
+        
+        return{
+            item_keys: item_keys,
+            get_category_items: get_category_items,
+            get_categories: get_categories
+        }
+    })(info, ui_controller);
+        
+     
+        
+    var events_controller = (function(data, ui){
+        var dom = ui.dom_strings, nav_li;
+        
+        var setup_event_listeners = function(){
+            nav_li = document.querySelectorAll(dom.nav_ul_li_a);
+            for(var i = 0; i < nav_li.length; i++){
+                nav_li[i].onclick = function(event){
+                    data.get_category_items(this.className);
+                    event.preventDefault();
+                }
+            }
+            
+            document.querySelector(dom.burger_nav).addEventListener("click",function(event){
+                document.querySelector(".nav_ul").classList.toggle("open");
+                event.preventDefault();
+            });
+        }
+
+        return{
+            init: function(){
+                data.get_categories();
+                setup_event_listeners();
+            }
+        }
+    })(data_controller, ui_controller);
+        
+    events_controller.init();
+</script>
+</body>
+</html>
